@@ -1,0 +1,174 @@
+{
+    "services": [
+      {
+        "name": "Deprexis",
+        "patientGroups": [
+          "F32.0 Leichte depressive Episode",
+          "F32.1 Mittelgradige depressive Episode",
+          "F32.2 Schwere depressive Episode ohne psychotische Symptome",
+          "F33.0 Rezidivierende depressive Störung, gegenwärtig leichte Episode",
+          "F33.1 Rezidivierende depressive Störung, gegenwärtig mittelgradige Episode",
+          "F33.2 Rezidivierende depressive Störung, gegenwärtig schwere Episode ohne psychotische Symptome"
+        ],
+        "suitableAges": [
+          "Erwachsene(r) (18-65 Jahre)",
+          "Erwachsene (älter als 65 Jahre)"
+        ],
+        "suitableGenders": [
+          "Männlich",
+          "Weiblich",
+          "Nichtbinäre Geschlechtsidentität"
+        ]
+      },
+      {
+        "name": "Edupression.com",
+        "patientGroups": [
+          "F32.0 Leichte depressive Episode",
+          "F32.1 Mittelgradige depressive Episode",
+          "F33.0 Rezidivierende depressive Störung, gegenwärtig leichte Episode",
+          "F33.1 Rezidivierende depressive Störung, gegenwärtig mittelgradige Episode"
+        ],
+        "suitableAges": [
+          "Erwachsene(r) (18-65 Jahre)"
+        ],
+        "suitableGenders": [
+          "Männlich",
+          "Weiblich",
+          "Nichtbinäre Geschlechtsidentität"
+        ]
+      },
+      {
+        "name": "Elona therapy Depression",
+        "patientGroups": [
+          "F32.0 Leichte depressive Episode",
+          "F32.1 Mittelgradige depressive Episode",
+          "F32.2 Schwere depressive Episode ohne psychotische Symptome",
+          "F33.0 Rezidivierende depressive Störung, gegenwärtig leichte Episode",
+          "F33.1 Rezidivierende depressive Störung, gegenwärtig mittelgradige Episode",
+          "F33.2 Rezidivierende depressive Störung, gegenwärtig schwere Episode ohne psychotische Symptome",
+          "F34.1 Dysthymia"
+        ],
+        "suitableAges": [
+          "Erwachsene(r) (18-65 Jahre)"
+        ],
+        "suitableGenders": [
+          "Männlich",
+          "Weiblich",
+          "Nichtbinäre Geschlechtsidentität"
+        ]
+      },
+      {
+        "name": "Hello Better Panik",
+        "patientGroups": [
+          "F40.01 Agoraphobie: Mit Panikstörung",
+          "F41.0 Panikstörung [episodisch paroxysmale Angst]"
+        ],
+        "suitableAges": [
+          "Erwachsene(r) (18-65 Jahre)",
+          "Erwachsene (älter als 65 Jahre)"
+        ],
+        "suitableGenders": [
+          "Männlich",
+          "Weiblich",
+          "Nichtbinäre Geschlechtsidentität"
+        ]
+      },
+      {
+        "name": "Invirto – Die Therapie gegen Angst",
+        "patientGroups": [
+          "F40.00 Agoraphobie: Ohne Angabe einer Panikstörung",
+          "F40.01 Agoraphobie: Mit Panikstörung",
+          "F40.1 Soziale Phobien",
+          "F41.0 Panikstörung [episodisch paroxysmale Angst]"
+        ],
+        "suitableAges": [
+          "Erwachsene(r) (18-65 Jahre)"
+        ],
+        "suitableGenders": [
+          "Männlich",
+          "Weiblich",
+          "Nichtbinäre Geschlechtsidentität"
+        ]
+      },
+      {
+        "name": "Mindable: Panik und Agoraphobie",
+        "patientGroups": [
+          "F40.0 Agoraphobie",
+          "F41.0 Panikstörung [episodisch paroxysmale Angst]"
+        ],
+        "suitableAges": [
+          "Erwachsene(r) (18-65 Jahre)",
+          "Erwachsene (älter als 65 Jahre)"
+        ],
+        "suitableGenders": [
+          "Männlich",
+          "Weiblich",
+          "Nichtbinäre Geschlechtsidentität"
+        ]
+      },
+      {
+        "name": "Mindable: Soziale Phobie",
+        "patientGroups": [
+          "F40.1 Soziale Phobien"
+        ],
+        "suitableAges": [
+          "Erwachsene(r) (18-65 Jahre)"
+        ],
+        "suitableGenders": [
+          "Männlich",
+          "Weiblich",
+          "Nichtbinäre Geschlechtsidentität"
+        ]
+      },
+      {
+        "name": "Novego: Aengste ueberwinden",
+        "patientGroups": [
+          "F40.0 Agoraphobie",
+          "F40.1 Soziale Phobien",
+          "F40.2 Spezifische (isolierte) Phobien",
+          "F41.0 Panikstörung [episodisch paroxysmale Angst]"
+        ],
+        "suitableAges": [
+          "Erwachsene(r) (18-65 Jahre)",
+          "Erwachsene (älter als 65 Jahre)"
+        ],
+        "suitableGenders": [
+          "Männlich",
+          "Weiblich",
+          "Nichtbinäre Geschlechtsidentität"
+        ]
+      },
+      {
+        "name": "Selfapy Online-Kurs bei Binge-Eating -Stoerung",
+        "patientGroups": [
+          "F50.4 Essattacken bei anderen psychischen Störungen",
+          "F50.8 Sonstige Essstörungen",
+          "F50.9 Essstörung, nicht näher bezeichnet"
+        ],
+        "suitableAges": [
+          "Erwachsene(r) (18-65 Jahre)"
+        ],
+        "suitableGenders": [
+          "Männlich",
+          "Weiblich",
+          "Nichtbinäre Geschlechtsidentität"
+        ]
+      },
+      {
+        "name": "Vorvida",
+        "patientGroups": [
+          "F10.1 Psychische und Verhaltensstörungen durch Alkohol: Schädlicher Gebrauch",
+          "F10.2 Psychische und Verhaltensstörungen durch Alkohol: Abhängigkeitssyndrom"
+        ],
+        "suitableAges": [
+          "Erwachsene(r) (18-65 Jahre)",
+          "Erwachsene (älter als 65 Jahre)"
+        ],
+        "suitableGenders": [
+          "Männlich",
+          "Weiblich",
+          "Nichtbinäre Geschlechtsidentität"
+        ]
+      }
+    ]
+  }
