@@ -5,6 +5,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:evi_example/chat_card.dart';
 import 'package:evi_example/provider/chat_provider.dart';
 import 'package:evi_example/utils.dart';
+import 'package:evi_example/config/app_config.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -174,7 +175,7 @@ class _MyHomePageState extends State<MyHomePage> {
       uri += '?access_token=${ConfigManager.instance.humeAccessToken}';
     } else if (ConfigManager.instance.humeApiKey.isNotEmpty) {
       uri +=
-          '?api_key=REPLACE_THIS_WITH_ACTUAL_HUME_API_KEY&config_id=REPLACE_THIS_WITH_ACTUAL_HUME_CONFIG_ID';
+          '?api_key=${AppConfig.humeApiKey}&config_id=REPLACE_THIS_WITH_ACTUAL_HUME_CONFIG_ID';
     } else {
       throw Exception('Please set your Hume API credentials in main.dart');
     }

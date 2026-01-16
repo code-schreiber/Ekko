@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../pages/emotion_page.dart';
 import './initial_sessions.dart'; // Add this import
+import '../config/app_config.dart';
 
 class ChatProvider extends ChangeNotifier {
   static const String PREFS_KEY = 'previous_chat';
@@ -79,7 +80,7 @@ class ChatProvider extends ChangeNotifier {
     final response = await http.get(
       url,
       headers: {
-        'X-Hume-Api-Key': 'REPLACE_THIS_WITH_ACTUAL_HUME_API_KEY',
+        'X-Hume-Api-Key': AppConfig.humeApiKey,
       },
     );
 
