@@ -13,6 +13,7 @@ import 'package:video_player/video_player.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 import '../evi_message.dart' as evi;
+import '../config/app_config.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
@@ -25,10 +26,10 @@ class _MyHomePageState extends State<MyHomePage> {
   // define config here for recorder
   final config = RecordConfig(
     encoder: AudioEncoder.pcm16bits,
-    bitRate: 48000 *
+    bitRate: AppConfig.audioSampleRate *
         2 *
-        16, // 48000 samples per second * 2 channels (stereo) * 16 bits per sample
-    sampleRate: 48000,
+        16, // sampleRate * 2 channels (stereo) * 16 bits per sample
+    sampleRate: AppConfig.audioSampleRate,
     numChannels: 1,
     autoGain: true,
     echoCancel: true,
@@ -169,12 +170,11 @@ class _MyHomePageState extends State<MyHomePage> {
           'Please use either an API key or an access token, not both');
     }
 
-    var uri = 'wss://api.hume.ai/v0/evi/chat';
+    var uri = AppConfig.humeWebSocketUrl;
     if (ConfigManager.instance.humeAccessToken.isNotEmpty) {
       uri += '?access_token=${ConfigManager.instance.humeAccessToken}';
     } else if (ConfigManager.instance.humeApiKey.isNotEmpty) {
-      uri +=
-          '?api_key=REPLACE_THIS_WITH_ACTUAL_HUME_API_KEY&config_id=REPLACE_THIS_WITH_ACTUAL_HUME_CONFIG_ID';
+      uri += '?api_key=${AppConfig.humeApiKey}&config_id=${AppConfig.humeConfigId}';
     } else {
       throw Exception('Please set your Hume API credentials in main.dart');
     }
@@ -298,8 +298,8 @@ class _MyHomePageState extends State<MyHomePage> {
     chatChannel!.sink.add(jsonEncode({
       'type': 'session_settings',
       'audio': {
-        'encoding': 'linear16',
-        'sample_rate': 48000,
+        'encoding': AppConfig.audioEncoding,
+        'sample_rate': AppConfig.audioSampleRate,
         'channels': 1,
       },
     }));
