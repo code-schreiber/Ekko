@@ -7,7 +7,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../pages/emotion_page.dart';
 import './initial_sessions.dart'; // Add this import
-import '../config/app_config.dart';
 
 class ChatProvider extends ChangeNotifier {
   static const String PREFS_KEY = 'previous_chat';
@@ -27,7 +26,7 @@ class ChatProvider extends ChangeNotifier {
 
   String whatWentWell = '';
   String challenges = '';
-  final String openAiApiKey = AppConfig.openAiApiKey;
+  final String openAiApiKey = 'REPLACE_THIS_WITH_ACTUAL_OPEN_AI_API_KEY'; // Replace with your actual key
 
   ChatProvider() {
     _loadSavedChats();
@@ -70,7 +69,7 @@ class ChatProvider extends ChangeNotifier {
   }
 
   Future<List<Map<String, dynamic>>> _fetchChatMessages(String chatId) async {
-    final url = Uri.parse('${AppConfig.humeChatUrl}/$chatId')
+    final url = Uri.parse('https://api.hume.ai/v0/evi/chats/$chatId')
         .replace(queryParameters: {
       'page_number': '0',
       'page_size': '100',
@@ -80,7 +79,7 @@ class ChatProvider extends ChangeNotifier {
     final response = await http.get(
       url,
       headers: {
-        'X-Hume-Api-Key': AppConfig.humeApiKey,
+        'X-Hume-Api-Key': 'REPLACE_THIS_WITH_ACTUAL_HUME_API_KEY',
       },
     );
 
@@ -165,13 +164,13 @@ class ChatProvider extends ChangeNotifier {
           .join(' ');
 
       final response = await http.post(
-        Uri.parse(AppConfig.openAiChatUrl),
+        Uri.parse('https://api.openai.com/v1/chat/completions'),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $openAiApiKey',
         },
         body: jsonEncode({
-          'model': AppConfig.openAiModel,
+          'model': 'gpt-4o-mini',
           'messages': [
             {
               'role': 'system',
@@ -205,13 +204,13 @@ class ChatProvider extends ChangeNotifier {
           .join(' ');
 
       final response = await http.post(
-        Uri.parse(AppConfig.openAiChatUrl),
+        Uri.parse('https://api.openai.com/v1/chat/completions'),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $openAiApiKey',
         },
         body: jsonEncode({
-          'model': AppConfig.openAiModel,
+          'model': 'gpt-4o-mini',
           'messages': [
             {
               'role': 'system',
@@ -259,13 +258,14 @@ class ChatProvider extends ChangeNotifier {
       challenges = await _processChallenges(userMessages);
 
       // Comment out DiGA recommendation
-/*
-       final openAiService = OpenAiService(
-           apiKey: AppConfig.openAiApiKey);
-       final digaRecommendation = await openAiService.makeDiGACall({
-         'messages': _chatMessages,
-       });
-       */
+      /*
+      final openAiService = OpenAiService(
+          apiKey:
+              'REPLACE_THIS_WITH_ACTUAL_OPEN_AI_API_KEY_2');
+      final digaRecommendation = await openAiService.makeDiGACall({
+        'messages': _chatMessages,
+      });
+      */
       final digaRecommendation = ""; // Add empty string instead
 
       // Store the processed chat data

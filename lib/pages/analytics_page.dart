@@ -6,7 +6,6 @@ import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 
 import '../provider/chat_provider.dart';
-import '../config/app_config.dart';
 
 class AnalyticsPage extends StatefulWidget {
   const AnalyticsPage({super.key});
@@ -23,7 +22,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
   List<String> successStories = [];
   bool showContent = false;
   bool isLoading = false;
-  final String openAiApiKey = AppConfig.openAiApiKey;
+  String openAiApiKey = 'REPLACE_THIS_WITH_ACTUAL_OPEN_AI_API_KEY';
   List<Map<String, dynamic>> relevantChats = [];
 
   List<Color> _colors = [
@@ -99,13 +98,13 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
     try {
       // Get areas for growth
       final growthResponse = await http.post(
-        Uri.parse(AppConfig.openAiChatUrl),
+        Uri.parse('https://api.openai.com/v1/chat/completions'),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $openAiApiKey',
         },
         body: jsonEncode({
-          'model': AppConfig.openAiModel,
+          'model': 'gpt-4o-mini',
           'messages': [
             {
               'role': 'system',
@@ -119,13 +118,13 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
 
       // Get success stories
       final successResponse = await http.post(
-        Uri.parse(AppConfig.openAiChatUrl),
+        Uri.parse('https://api.openai.com/v1/chat/completions'),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $openAiApiKey',
         },
         body: jsonEncode({
-          'model': AppConfig.openAiModel,
+          'model': 'gpt-4o-mini',
           'messages': [
             {
               'role': 'system',

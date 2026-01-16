@@ -3,7 +3,6 @@ import 'package:evi_example/pages/my_home_page.dart';
 import 'package:evi_example/pages/sessions_page.dart';
 import 'package:evi_example/provider/chat_provider.dart';
 import 'package:evi_example/utils.dart';
-import 'package:evi_example/config/app_config.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -12,10 +11,6 @@ import 'widgets/nav_bar.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
-  // Validate required environment variables at compile time
-  AppConfig.validate();
-  
   await ConfigManager.instance.loadConfig();
 
   runApp(
