@@ -26,11 +26,6 @@ jobs:
       - name: Run tests
         run: flutter test --coverage
 
-      - name: Upload coverage
-        uses: codecov/codecov-action@v4
-        with:
-          file: coverage/lcov.info
-
   build:
     needs: test
     runs-on: ubuntu-latest
