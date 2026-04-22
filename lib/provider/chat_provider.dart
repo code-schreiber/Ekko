@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../pages/emotion_page.dart';
+import '../utils.dart';
 import './initial_sessions.dart'; // Add this import
 
 class ChatProvider extends ChangeNotifier {
@@ -79,7 +80,7 @@ class ChatProvider extends ChangeNotifier {
     final response = await http.get(
       url,
       headers: {
-        'X-Hume-Api-Key': 'REPLACE_THIS_WITH_ACTUAL_HUME_API_KEY',
+        'X-Hume-Api-Key': ConfigManager.instance.humeApiKey,
       },
     );
 
@@ -91,7 +92,7 @@ class ChatProvider extends ChangeNotifier {
     final allMessages = data['events_page']
         .map((message) => {
               'role': message['role'],
-              'text': message['message_text'],
+              'text': message['text'],
               'emotion_features': message['emotion_features'],
             })
         .toList()
