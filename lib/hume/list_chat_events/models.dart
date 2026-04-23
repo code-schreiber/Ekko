@@ -1,5 +1,10 @@
 import 'dart:convert';
 
+// Quick usage example (from OpenAPI spec):
+// final sampleJson = '''<INSERT JSON HERE>''';
+// final resp = ListChatEventsResponse.fromJson(sampleJson);
+// print(resp.toJsonPretty());
+
 // Dart data models for the List Chat Events endpoint, built from the
 // OpenAPI spec in List chat events OpenAPI Specification.md.
 
@@ -62,6 +67,29 @@ class ListChatEventsResponse {
     required this.status,
     required this.totalPages,
   });
+
+  // Pretty-print helper: returns a nicely indented JSON representation
+  String toJsonPretty() {
+    return const JsonEncoder.withIndent('  ').convert(toMap());
+  }
+
+  // Serialize to a plain Map for pretty-printing or further processing
+  Map<String, dynamic> toMap() {
+    return {
+      'chat_group_id': chatGroupId,
+      'config': config.toMap(),
+      'end_timestamp': endTimestamp,
+      'events_page': eventsPage.map((e) => e.toMap()).toList(),
+      'id': id,
+      'metadata': metadata,
+      'page_number': pageNumber,
+      'page_size': pageSize,
+      'pagination_direction': paginationDirection.toString().split('.').last,
+      'start_timestamp': startTimestamp,
+      'status': status.toString().split('.').last,
+      'total_pages': totalPages,
+    };
+  }
 
   factory ListChatEventsResponse.fromJson(String jsonStr) {
     final Map<String, dynamic> map =
@@ -145,6 +173,16 @@ class ReturnConfigSpec {
   }
 }
 
+// Helpers to serialize nested types
+extension _ReturnConfigSpecToMap on ReturnConfigSpec {
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'version': version,
+    };
+  }
+}
+
 // Chat event payload
 class ChatEvent {
   final String chatId;
@@ -181,6 +219,22 @@ class ChatEvent {
       timestamp: map['timestamp'] as int,
       type: _parseEventType(map['type'] as String)!,
     );
+  }
+}
+
+extension _ChatEventToMap on ChatEvent {
+  Map<String, dynamic> toMap() {
+    return {
+      'chat_id': chatId,
+      'emotion_features': emotionFeatures,
+      'id': id,
+      'message_text': messageText,
+      'metadata': metadata,
+      'related_event_id': relatedEventId,
+      'role': role.toString().split('.').last,
+      'timestamp': timestamp,
+      'type': type.toString().split('.').last,
+    };
   }
 }
 
