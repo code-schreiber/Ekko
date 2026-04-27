@@ -87,7 +87,11 @@ class ChatProvider extends ChangeNotifier {
       throw Exception('Failed to fetch messages: ${response.statusCode}');
     }
 
-    final data = json.decode(response.body);
+    return filterMessages(response.body);
+  }
+
+  filterMessages(String body) {
+     final data = json.decode(body);
     final allMessages = data['events_page']
         .map((message) => {
               'role': message['role'],
@@ -103,11 +107,10 @@ class ChatProvider extends ChangeNotifier {
         allMessages.first['text'].length > 200) {
       allMessages.removeAt(0);
     }
-
     return allMessages;
   }
 
-  Map<String, double> _processEmotions(List<Map<String, dynamic>> messages) {
+  Map<String, double> processEmotions(List<Map<String, dynamic>> messages) {
     Map<String, double> allEmotions = {};
     int messageCount = 0;
 
@@ -253,7 +256,7 @@ class ChatProvider extends ChangeNotifier {
         return false;
       }
 
-      emotions = _processEmotions(userMessages);
+      emotions = processEmotions(userMessages);
       whatWentWell = await _processWhatWentWell(userMessages);
       challenges = await _processChallenges(userMessages);
 
