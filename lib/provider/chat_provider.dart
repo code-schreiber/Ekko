@@ -90,7 +90,7 @@ class ChatProvider extends ChangeNotifier {
     return filterMessages(response.body);
   }
 
-  filterMessages(String body) {
+  static List<Map<String, dynamic>> filterMessages(String body) {
      final data = json.decode(body);
     final allMessages = data['events_page']
         .map((message) => {
@@ -110,7 +110,7 @@ class ChatProvider extends ChangeNotifier {
     return allMessages;
   }
 
-  Map<String, double> processEmotions(List<Map<String, dynamic>> messages) {
+  static Map<String, double> processEmotions(List<Map<String, dynamic>> messages) {
     Map<String, double> allEmotions = {};
     int messageCount = 0;
 
