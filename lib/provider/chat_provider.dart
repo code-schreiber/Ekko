@@ -68,7 +68,7 @@ class ChatProvider extends ChangeNotifier {
     _context = context;
   }
 
-  Future<List<Map<String, dynamic>>> _fetchChatMessages(String chatId) async {
+  Future<String> _fetchChatMessages(String chatId) async {
     final url = Uri.parse('https://api.hume.ai/v0/evi/chats/$chatId')
         .replace(queryParameters: {
       'page_number': '0',
@@ -86,8 +86,7 @@ class ChatProvider extends ChangeNotifier {
     if (response.statusCode != 200) {
       throw Exception('Failed to fetch messages: ${response.statusCode}');
     }
-
-    return filterMessages(response.body);
+    return response.body;
   }
 
   static List<Map<String, dynamic>> filterMessages(String body) {
@@ -104,6 +103,7 @@ class ChatProvider extends ChangeNotifier {
     // Remove messages from the start until finding one less than 200 characters
     while (allMessages.isNotEmpty &&
         allMessages.first['role'] != 'USER' &&
+        allMessages.first['text'] != null &&
         allMessages.first['text'].length > 200) {
       allMessages.removeAt(0);
     }
@@ -243,14 +243,11 @@ class ChatProvider extends ChangeNotifier {
     if (_chats.isEmpty) return false;
 
     try {
-      final chatId = _chats.last['chat_id'];
-
-      // Fetch messages
-      final messages = await _fetchChatMessages(chatId);
-      _chatMessages = messages;
+      final body = await _fetchChatMessages(_chats.last['chat_id']);
+      _chatMessages = filterMessages(body);
 
       // Process emotions for user messages
-      final userMessages = messages.where((m) => m['role'] == 'USER').toList();
+      final userMessages = _chatMessages.where((m) => m['role'] == 'USER').toList();
       if (userMessages.isEmpty) {
         print('No user messages found.');
         return false;

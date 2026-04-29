@@ -59,9 +59,11 @@ void main() {
 
         final result = ChatProvider.filterMessages(json);
 
-        expect(result[0]['text'], '1x');
-        expect(result[1]['text'], '2x');
-        expect(result.length, 2);
+        expect(result[0]["role"], "SYSTEM");
+        expect(result[1]["role"], "USER");
+        expect(result[2]["role"], "SYSTEM");
+        expect(result[3]["role"], "SYSTEM");
+        expect(result.length, 4);
       });
 
       test('handles empty events_page list', () {
