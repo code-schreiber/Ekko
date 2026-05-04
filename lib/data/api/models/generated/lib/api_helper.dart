@@ -71,6 +71,16 @@ String parameterToString(dynamic value) {
   if (value is ReturnChatEventType) {
     return ReturnChatEventTypeTypeTransformer().encode(value).toString();
   }
+  if (value is ReturnChatPagedEventsPaginationDirection) {
+    return ReturnChatPagedEventsPaginationDirectionTypeTransformer()
+        .encode(value)
+        .toString();
+  }
+  if (value is ReturnChatPagedEventsStatus) {
+    return ReturnChatPagedEventsStatusTypeTransformer()
+        .encode(value)
+        .toString();
+  }
   return value.toString();
 }
 
