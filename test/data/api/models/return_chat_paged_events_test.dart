@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:evi_example/data/api/models/generated/lib/api.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -5,8 +7,10 @@ void main() {
   group('ReturnChatPagedEvents', () {
     test('should parse return_chat_paged_events correctly', () {});
 
-    test('to throw error for empty JSON`', () async {
-      expect(() => ReturnChatPagedEvents.fromJson("{}"), throwsAssertionError);
+    test('to return null for empty JSON`', () async {
+      var result = ReturnChatPagedEvents.fromJson("{}");
+      
+      expect(result, isNull);
     });
 
     test('to do basic mapping of required keys', () async {
@@ -34,7 +38,7 @@ void main() {
       }
       ''';
 
-      final result = ReturnChatPagedEvents.fromJson(jsonString);
+      final result = ReturnChatPagedEvents.fromJson(jsonDecode(jsonString));
 
       expect(result, isNotNull);
       expect(result!.chatGroupId, "770e8400-e29b-41d4-a716-446655440000");

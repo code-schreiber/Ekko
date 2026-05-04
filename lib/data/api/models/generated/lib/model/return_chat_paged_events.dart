@@ -139,10 +139,9 @@ class ReturnChatPagedEvents {
   /// Returns a new [ReturnChatPagedEvents] instance and imports its values from
   /// [value] if it's a [Map], null otherwise.
   // ignore: prefer_constructors_over_static_methods
-  static ReturnChatPagedEvents? fromJson(String value) {
-    final data = jsonDecode(value);
-    if (data is Map) {
-      final json = data.cast<String, dynamic>();
+  static ReturnChatPagedEvents? fromJson(dynamic value) {
+    if (value is Map) {
+      final json = value.cast<String, dynamic>();
 
       // Ensure that the map contains the required keys.
       // Note 1: the values aren't checked for validity beyond being non-null.

@@ -1,10 +1,12 @@
 import 'dart:convert';
 
+import 'package:evi_example/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../data/api/models/generated/lib/api.dart';
 import '../pages/emotion_page.dart';
 import './initial_sessions.dart'; // Add this import
 
@@ -68,41 +70,35 @@ class ChatProvider extends ChangeNotifier {
     _context = context;
   }
 
-  Future<String> _fetchChatMessages(String chatId) async {
-    final url = Uri.parse('https://api.hume.ai/v0/evi/chats/$chatId')
-        .replace(queryParameters: {
-      'page_number': '0',
-      'page_size': '100',
-      'ascending_order': 'false',
-    });
-
-    final response = await http.get(
-      url,
-      headers: {
-        'X-Hume-Api-Key': 'REPLACE_THIS_WITH_ACTUAL_HUME_API_KEY',
-      },
-    );
-
-    if (response.statusCode != 200) {
-      throw Exception('Failed to fetch messages: ${response.statusCode}');
+  Future<ReturnChatPagedEvents> _fetchChatMessages(String chatId) async {
+    try {
+      final events = await SubpackageChatsApi().listChatEvents(
+          chatId,
+          ConfigManager.instance.humeApiKey,
+          pageNumber: 0,
+          pageSize: 100,
+          ascendingOrder: false,
+      );
+      if (events == null) throw Exception('Failed to fetch messages: null events');
+      return events;
+    } catch (e) {
+      throw Exception('Failed to fetch messages: $e');
     }
-    return response.body;
   }
 
-  static List<Map<String, dynamic>> filterMessages(String body) {
-     final data = json.decode(body);
-    final allMessages = data['events_page']
+  static List<Map<String, dynamic>> filterMessages(ReturnChatPagedEvents events) {
+     final allMessages = events.eventsPage
         .map((message) => {
-              'role': message['role'],
-              'text': message['message_text'],
-              'emotion_features': message['emotion_features'],
+              'role': message.role,
+              'text': message.messageText,
+              'emotion_features': message.emotionFeatures,
             })
         .toList()
         .cast<Map<String, dynamic>>();
     print(allMessages);
     // Remove messages from the start until finding one less than 200 characters
     while (allMessages.isNotEmpty &&
-        allMessages.first['role'] != 'USER' &&
+        allMessages.first['role'] != ReturnChatEventRole.USER &&
         allMessages.first['text'] != null &&
         allMessages.first['text'].length > 200) {
       allMessages.removeAt(0);
@@ -243,7 +239,8 @@ class ChatProvider extends ChangeNotifier {
     if (_chats.isEmpty) return false;
 
     try {
-      final body = await _fetchChatMessages(_chats.last['chat_id']);
+      var chatId = _chats.last['chat_id'];
+      final body = await _fetchChatMessages(chatId);
       _chatMessages = filterMessages(body);
 
       // Process emotions for user messages

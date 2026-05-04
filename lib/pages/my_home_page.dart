@@ -174,7 +174,7 @@ class _MyHomePageState extends State<MyHomePage> {
       uri += '?access_token=${ConfigManager.instance.humeAccessToken}';
     } else if (ConfigManager.instance.humeApiKey.isNotEmpty) {
       uri +=
-          '?api_key=REPLACE_THIS_WITH_ACTUAL_HUME_API_KEY&config_id=REPLACE_THIS_WITH_ACTUAL_HUME_CONFIG_ID';
+          '?api_key=${ConfigManager.instance.humeApiKey}';
     } else {
       throw Exception('Please set your Hume API credentials in main.dart');
     }

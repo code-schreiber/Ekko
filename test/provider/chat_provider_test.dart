@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:evi_example/data/api/models/generated/lib/api.dart';
 import 'package:evi_example/provider/chat_provider.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -8,7 +10,7 @@ void main() {
       test(
           'removes messages from the start until finding one less than 200 characters',
           () {
-        final body = '''
+        final jsonString = '''
           {
             "chat_group_id": "",
             "events_page": [
@@ -40,15 +42,16 @@ void main() {
             "total_pages": 0
           }
         ''';
+        final events = ReturnChatPagedEvents.fromJson(jsonDecode(jsonString))!;
 
-        final result = ChatProvider.filterMessages(body);
+        final result = ChatProvider.filterMessages(events);
 
         expect(result[0]['text'], "this is less than 200 characters");
         expect(result.length, 1);
       });
 
       test('handles null message_text gracefully', () {
-        final body = '''
+        final jsonString = '''
           {
             "events_page": [
               {
@@ -98,8 +101,9 @@ void main() {
             "total_pages": 0
           }
         ''';
+        final events = ReturnChatPagedEvents.fromJson(jsonDecode(jsonString))!;
 
-        final result = ChatProvider.filterMessages(body);
+        final result = ChatProvider.filterMessages(events);
 
         expect(result[0]["role"], ReturnChatEventRole.SYSTEM);
         expect(result[1]["role"], ReturnChatEventRole.USER);
@@ -109,7 +113,7 @@ void main() {
       });
 
       test('handles empty events_page list', () {
-        final body = '''
+        final jsonString = '''
           {
             "chat_group_id": "",
             "events_page": [
@@ -123,14 +127,15 @@ void main() {
             "total_pages": 0
           }
         ''';
+        final events = ReturnChatPagedEvents.fromJson(jsonDecode(jsonString))!;
 
-        final result = ChatProvider.filterMessages(body);
+        final result = ChatProvider.filterMessages(events);
 
         expect(result, isEmpty);
       });
 
       test('no trimming when first message is USER', () {
-        final body = '''
+        final jsonString = '''
           {
             "chat_group_id": "",
             "events_page": [
@@ -153,15 +158,16 @@ void main() {
             "total_pages": 0
           }
         ''';
+        final events = ReturnChatPagedEvents.fromJson(jsonDecode(jsonString))!;
 
-        final result = ChatProvider.filterMessages(body);
+        final result = ChatProvider.filterMessages(events);
 
         expect(result.length, 1);
         expect(result.first['role'], ReturnChatEventRole.USER);
       });
 
       test('stops trimming when non-USER message is short (<= 200 chars)', () {
-        final body = '''
+        final jsonString = '''
         {
           "events_page": [
             {
@@ -202,8 +208,9 @@ void main() {
           "total_pages": 0
         }
         ''';
+        final events = ReturnChatPagedEvents.fromJson(jsonDecode(jsonString))!;
 
-        final result = ChatProvider.filterMessages(body);
+        final result = ChatProvider.filterMessages(events);
 
         // It should stop at the "Short message" because it's <= 200 chars, even though it's not USER.
         expect(result, isNotEmpty);
@@ -213,7 +220,7 @@ void main() {
       });
 
       test('trims multiple long non-USER messages', () {
-        final body = '''
+        final jsonString = '''
         {
           "events_page": [
             {
@@ -254,8 +261,9 @@ void main() {
           "total_pages": 0
         }
         ''';
+        final events = ReturnChatPagedEvents.fromJson(jsonDecode(jsonString))!;
 
-        final result = ChatProvider.filterMessages(body);
+        final result = ChatProvider.filterMessages(events);
 
         expect(result, isNotEmpty);
         expect(result.first['role'], ReturnChatEventRole.USER);
@@ -263,7 +271,7 @@ void main() {
       });
 
       test('trims until specific condition is met in mixed sequence', () {
-        final body = '''
+        final jsonString = '''
         {
           "events_page": [
             {
@@ -313,8 +321,9 @@ void main() {
           "total_pages": 0
         }
         ''';
+        final events = ReturnChatPagedEvents.fromJson(jsonDecode(jsonString))!;
 
-        final result = ChatProvider.filterMessages(body);
+        final result = ChatProvider.filterMessages(events);
 
         expect(result, isNotEmpty);
         expect(result.first['text'], 'Short one');
@@ -322,7 +331,7 @@ void main() {
       });
 
       test('stops trimming if role changes to USER', () {
-        final body = '''
+        final jsonString = '''
         {
           "events_page": [
             {
@@ -354,25 +363,14 @@ void main() {
           "total_pages": 0
         }
         ''';
+        final events = ReturnChatPagedEvents.fromJson(jsonDecode(jsonString))!;
 
-        final result = ChatProvider.filterMessages(body);
+        final result = ChatProvider.filterMessages(events);
 
         // Even if the USER message is long, it should stop because role == 'USER'.
         expect(result, isNotEmpty);
         expect(result.first['role'], ReturnChatEventRole.USER);
         expect(result.length, 1);
-      });
-
-      test('handles malformed JSON input', () {
-        final body = '{ invalid }';
-        expect(() => ChatProvider.filterMessages(body),
-            throwsA(isA<FormatException>()));
-      });
-
-      test('throws error when missing events_page in JSON', () {
-        final body = '{"not_events": []}';
-
-        expect(() => ChatProvider.filterMessages(body), throwsAssertionError);
       });
     });
 
