@@ -1,4 +1,4 @@
-import 'package:evi_example/data/api/models/generated/lib/api.dart';
+import 'package:evi_example/data/api/generated/export.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'dart:convert';
 
@@ -23,10 +23,10 @@ void main() {
       final event = ReturnChatEvent.fromJson(jsonMap);
 
       expect(event, isNotNull);
-      expect(event!.chatId, '550e8400-e29b-41d4-a716-446655440000');
+      expect(event.chatId, '550e8400-e29b-41d4-a716-446655440000');
       expect(event.id, '660e8400-e29b-41d4-a716-446655440000');
-      expect(event.role, ReturnChatEventRole.USER);
-      expect(event.type, ReturnChatEventType.USER_MESSAGE);
+      expect(event.role, ReturnChatEventRole.user);
+      expect(event.type, ReturnChatEventType.userMessage);
       expect(event.messageText, 'Hello world');
       expect(event.timestamp, 1672531200);
       // Double-parsing check for emotion_features
@@ -55,7 +55,7 @@ void main() {
       final event = ReturnChatEvent.fromJson(jsonMap);
 
       expect(event, isNotNull);
-      expect(event!.emotionFeatures, isNull);
+      expect(event.emotionFeatures, isNull);
     });
   });
 }

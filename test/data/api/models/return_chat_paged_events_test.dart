@@ -1,6 +1,5 @@
 import 'dart:convert';
-
-import 'package:evi_example/data/api/models/generated/lib/api.dart';
+import 'package:evi_example/data/api/generated/export.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -8,9 +7,7 @@ void main() {
     test('should parse return_chat_paged_events correctly', () {});
 
     test('to return null for empty JSON`', () async {
-      var result = ReturnChatPagedEvents.fromJson("{}");
-      
-      expect(result, isNull);
+      expect(ReturnChatPagedEvents.fromJson({}), throwsAssertionError);
     });
 
     test('to do basic mapping of required keys', () async {
@@ -34,29 +31,32 @@ void main() {
         "pagination_direction": "ASC",
         "start_timestamp": 1672531200,
         "status": "ACTIVE",
-        "total_pages": 1
+        "total_pages": 1,
+        "config": {
+          "id": "config1d",
+          "version": 0
+        }
       }
       ''';
 
       final result = ReturnChatPagedEvents.fromJson(jsonDecode(jsonString));
 
       expect(result, isNotNull);
-      expect(result!.chatGroupId, "770e8400-e29b-41d4-a716-446655440000");
+      expect(result.chatGroupId, "770e8400-e29b-41d4-a716-446655440000");
       expect(result.eventsPage[0].chatId, "550e8400-e29b-41d4-a716");
       expect(result.eventsPage[0].emotionFeatures, "{\"happiness\": 0.5}");
       expect(result.eventsPage[0].id, "660e8400-e29b-41d4-a716-446655440000");
       expect(result.eventsPage[0].messageText, "Event 1");
-      expect(result.eventsPage[0].role, ReturnChatEventRole.USER);
+      expect(result.eventsPage[0].role, ReturnChatEventRole.user);
       expect(result.eventsPage[0].timestamp, 1672531200);
-      expect(result.eventsPage[0].type, ReturnChatEventType.USER_MESSAGE);
+      expect(result.eventsPage[0].type, ReturnChatEventType.userMessage);
       expect(result.eventsPage.length, 1);
       expect(result.id, "990e8400-e29b-41d4-a716-446655440000");
       expect(result.pageNumber, 0);
       expect(result.pageSize, 10);
-      expect(result.paginationDirection,
-          ReturnChatPagedEventsPaginationDirection.ASC);
+      expect(result.paginationDirection, ReturnChatPagedEventsPaginationDirection.asc);
       expect(result.startTimestamp, 1672531200);
-      expect(result.status, ReturnChatPagedEventsStatus.ACTIVE);
+      expect(result.status, ReturnChatPagedEventsStatus.active);
       expect(result.totalPages, 1);
     });
   });

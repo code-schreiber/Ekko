@@ -1,6 +1,5 @@
 import 'dart:convert';
-
-import 'package:evi_example/data/api/models/generated/lib/api.dart';
+import 'package:evi_example/data/api/generated/export.dart';
 import 'package:evi_example/provider/chat_provider.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -39,10 +38,14 @@ void main() {
             "pagination_direction": "ASC",
             "start_timestamp": 0,
             "status": "ACTIVE",
-            "total_pages": 0
+            "total_pages": 0,
+            "config": {
+              "id": "config1d",
+              "version": 0
+            }
           }
         ''';
-        final events = ReturnChatPagedEvents.fromJson(jsonDecode(jsonString))!;
+        final events = ReturnChatPagedEvents.fromJson(jsonDecode(jsonString));
 
         final result = ChatProvider.filterMessages(events);
 
@@ -98,17 +101,21 @@ void main() {
             "pagination_direction": "ASC",
             "start_timestamp": 0,
             "status": "ACTIVE",
-            "total_pages": 0
+            "total_pages": 0,
+            "config": {
+              "id": "config1d",
+              "version": 0
+            }
           }
         ''';
-        final events = ReturnChatPagedEvents.fromJson(jsonDecode(jsonString))!;
+        final events = ReturnChatPagedEvents.fromJson(jsonDecode(jsonString));
 
         final result = ChatProvider.filterMessages(events);
 
-        expect(result[0]["role"], ReturnChatEventRole.SYSTEM);
-        expect(result[1]["role"], ReturnChatEventRole.USER);
-        expect(result[2]["role"], ReturnChatEventRole.SYSTEM);
-        expect(result[3]["role"], ReturnChatEventRole.SYSTEM);
+        expect(result[0]["role"], ReturnChatEventRole.system);
+        expect(result[1]["role"], ReturnChatEventRole.user);
+        expect(result[2]["role"], ReturnChatEventRole.system);
+        expect(result[3]["role"], ReturnChatEventRole.system);
         expect(result.length, 4);
       });
 
@@ -124,10 +131,14 @@ void main() {
             "pagination_direction": "ASC",
             "start_timestamp": 0,
             "status": "ACTIVE",
-            "total_pages": 0
+            "total_pages": 0,
+            "config": {
+              "id": "config1d",
+              "version": 0
+            }
           }
         ''';
-        final events = ReturnChatPagedEvents.fromJson(jsonDecode(jsonString))!;
+        final events = ReturnChatPagedEvents.fromJson(jsonDecode(jsonString));
 
         final result = ChatProvider.filterMessages(events);
 
@@ -155,15 +166,19 @@ void main() {
             "pagination_direction": "ASC",
             "start_timestamp": 0,
             "status": "ACTIVE",
-            "total_pages": 0
+            "total_pages": 0,
+            "config": {
+              "id": "config1d",
+              "version": 0
+            }
           }
         ''';
-        final events = ReturnChatPagedEvents.fromJson(jsonDecode(jsonString))!;
+        final events = ReturnChatPagedEvents.fromJson(jsonDecode(jsonString));
 
         final result = ChatProvider.filterMessages(events);
 
         expect(result.length, 1);
-        expect(result.first['role'], ReturnChatEventRole.USER);
+        expect(result.first['role'], ReturnChatEventRole.user);
       });
 
       test('stops trimming when non-USER message is short (<= 200 chars)', () {
@@ -205,10 +220,14 @@ void main() {
           "pagination_direction": "ASC",
           "start_timestamp": 0,
           "status": "ACTIVE",
-          "total_pages": 0
+          "total_pages": 0,
+          "config": {
+            "id": "config1d",
+            "version": 0
+          }
         }
         ''';
-        final events = ReturnChatPagedEvents.fromJson(jsonDecode(jsonString))!;
+        final events = ReturnChatPagedEvents.fromJson(jsonDecode(jsonString));
 
         final result = ChatProvider.filterMessages(events);
 
@@ -258,15 +277,19 @@ void main() {
           "pagination_direction": "ASC",
           "start_timestamp": 0,
           "status": "ACTIVE",
-          "total_pages": 0
+          "total_pages": 0,
+          "config": {
+            "id": "config1d",
+            "version": 0
+          }
         }
         ''';
-        final events = ReturnChatPagedEvents.fromJson(jsonDecode(jsonString))!;
+        final events = ReturnChatPagedEvents.fromJson(jsonDecode(jsonString));
 
         final result = ChatProvider.filterMessages(events);
 
         expect(result, isNotEmpty);
-        expect(result.first['role'], ReturnChatEventRole.USER);
+        expect(result.first['role'], ReturnChatEventRole.user);
         expect(result.length, 1);
       });
 
@@ -318,10 +341,14 @@ void main() {
           "pagination_direction": "ASC",
           "start_timestamp": 0,
           "status": "ACTIVE",
-          "total_pages": 0
+          "total_pages": 0,
+          "config": {
+            "id": "config1d",
+            "version": 0
+          }
         }
         ''';
-        final events = ReturnChatPagedEvents.fromJson(jsonDecode(jsonString))!;
+        final events = ReturnChatPagedEvents.fromJson(jsonDecode(jsonString));
 
         final result = ChatProvider.filterMessages(events);
 
@@ -360,16 +387,20 @@ void main() {
           "pagination_direction": "ASC",
           "start_timestamp": 0,
           "status": "ACTIVE",
-          "total_pages": 0
+          "total_pages": 0,
+          "config": {
+            "id": "config1d",
+            "version": 0
+          }
         }
         ''';
-        final events = ReturnChatPagedEvents.fromJson(jsonDecode(jsonString))!;
+        final events = ReturnChatPagedEvents.fromJson(jsonDecode(jsonString));
 
         final result = ChatProvider.filterMessages(events);
 
         // Even if the USER message is long, it should stop because role == 'USER'.
         expect(result, isNotEmpty);
-        expect(result.first['role'], ReturnChatEventRole.USER);
+        expect(result.first['role'], ReturnChatEventRole.user);
         expect(result.length, 1);
       });
     });

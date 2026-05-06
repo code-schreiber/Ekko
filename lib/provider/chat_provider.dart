@@ -1,12 +1,11 @@
 import 'dart:convert';
 
+import 'package:dio/dio.dart';
+import 'package:evi_example/data/api/generated/export.dart';
 import 'package:evi_example/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-
 import 'package:shared_preferences/shared_preferences.dart';
-
-import '../data/api/models/generated/lib/api.dart';
 import '../pages/emotion_page.dart';
 import './initial_sessions.dart'; // Add this import
 
@@ -72,14 +71,16 @@ class ChatProvider extends ChangeNotifier {
 
   Future<ReturnChatPagedEvents> _fetchChatMessages(String chatId) async {
     try {
-      final events = await SubpackageChatsApi().listChatEvents(
-          chatId,
-          ConfigManager.instance.humeApiKey,
-          pageNumber: 0,
-          pageSize: 100,
-          ascendingOrder: false,
+      var baseUrl = 'https://api.hume.ai/'; // TODO extract duplicate
+      final dio = Dio(BaseOptions(baseUrl: baseUrl));
+      final client = RestClient(dio);
+      final events = await client.subpackageChats.listChatEvents(
+        id:  chatId,
+        xHumeApiKey:   ConfigManager.instance.humeApiKey,
+        pageNumber: 0,
+        pageSize: 100,
+        ascendingOrder: false,
       );
-      if (events == null) throw Exception('Failed to fetch messages: null events');
       return events;
     } catch (e) {
       throw Exception('Failed to fetch messages: $e');
@@ -98,7 +99,7 @@ class ChatProvider extends ChangeNotifier {
     print(allMessages);
     // Remove messages from the start until finding one less than 200 characters
     while (allMessages.isNotEmpty &&
-        allMessages.first['role'] != ReturnChatEventRole.USER &&
+        allMessages.first['role'] != ReturnChatEventRole.user &&
         allMessages.first['text'] != null &&
         allMessages.first['text'].length > 200) {
       allMessages.removeAt(0);
