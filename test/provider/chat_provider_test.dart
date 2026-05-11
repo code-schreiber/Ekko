@@ -451,7 +451,7 @@ void main() {
         expect(result.length, 1);
       });
 
-      test('ignores empty emotion_features', () {
+      test('handles empty emotion_features object {}', () {
         final messages = [
           {'emotion_features': '{"Admiration": 0.8}'},
           {'emotion_features': '{}'}
@@ -462,6 +462,19 @@ void main() {
         final expected = <String, double>{};
         expected['Admiration'] = 0.4;
         expect(result, expected);
+      });
+
+      test('skips emotion_features that decodes to non-Map type (e.g. JSON array)', () {
+        final messages = [
+          {'emotion_features': '[]'},
+          {'emotion_features': '{"Admiration": 0.8}'},
+          {'emotion_features': '"just_a_string"'}
+        ];
+
+        final result = ChatProvider.processEmotions(messages);
+
+        expect(result['Admiration'], 0.8);
+        expect(result.length, 1);
       });
     });
   });
