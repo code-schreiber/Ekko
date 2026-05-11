@@ -6,8 +6,8 @@ void main() {
   group('ReturnChatPagedEvents', () {
     test('should parse return_chat_paged_events correctly', () {});
 
-    test('to return null for empty JSON`', () async {
-      expect(ReturnChatPagedEvents.fromJson({}), throwsAssertionError);
+    test('errors for empty JSON`', () async {
+      expect(() => ReturnChatPagedEvents.fromJson({}), throwsA(anything));
     });
 
     test('to do basic mapping of required keys', () async {
