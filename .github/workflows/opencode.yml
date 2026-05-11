@@ -8,7 +8,7 @@ jobs:
   review:
     runs-on: ubuntu-latest
     permissions:
-      id-token: read
+      id-token: write
       contents: read
       pull-requests: read
     steps:
