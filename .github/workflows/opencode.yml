@@ -16,7 +16,7 @@ jobs:
           persist-credentials: false
       - uses: anomalyco/opencode/github@latest
         with:
-          model: Big Pickle
+          model: opencode/big-pickle
           share: false
           prompt: |
             Review this pull request:
