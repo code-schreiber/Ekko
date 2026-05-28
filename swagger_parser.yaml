@@ -1,5 +1,0 @@
-swagger_parser:
-  schema_path: lib/data/api/chat_events_spec.yaml
-  output_directory: lib/data/api/generated
-  json_serializer: json_serializable
-  root_client: true
