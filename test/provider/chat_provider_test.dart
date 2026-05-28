@@ -1,0 +1,474 @@
+import 'dart:convert';
+import 'package:evi_example/provider/chat_provider.dart';
+import 'package:flutter_test/flutter_test.dart';
+
+void main() {
+  group('ChatProvider Tests', () {
+    group('filterMessages', () {
+      test(
+          'removes messages from the start until finding one less than 200 characters',
+          () {
+        final jsonString = '''
+          {
+            "chat_group_id": "",
+            "events_page": [
+              {
+                "role": "SYSTEM",
+                "message_text": "this is more than 200 characters long this is more than 200 characters long this is more than 200 characters long this is more than 200 characters long this is more than 200 characters long this is long",
+                "emotion_features": null,
+                "chat_id": "",
+                "id": "",
+                "timestamp": 0,
+                "type": "USER_MESSAGE"
+              },
+              {
+                "role": "SYSTEM",
+                "message_text": "this is less than 200 characters",
+                "emotion_features": null,
+                "chat_id": "",
+                "id": "",
+                "timestamp": 0,
+                "type": "USER_MESSAGE"
+              }
+            ],
+            "id": "",
+            "page_number": 0,
+            "page_size": 0,
+            "pagination_direction": "ASC",
+            "start_timestamp": 0,
+            "status": "ACTIVE",
+            "total_pages": 0,
+            "config": {
+              "id": "config1d",
+              "version": 0
+            }
+          }
+        ''';
+
+        final result = ChatProvider.filterMessages(jsonString);
+
+        expect(result[0]['text'], "this is less than 200 characters");
+        expect(result.length, 1);
+      });
+
+      test('handles null message_text gracefully', () {
+        final jsonString = '''
+          {
+            "events_page": [
+              {
+                "role": "SYSTEM",
+                "message_text": null,
+                "emotion_features": null,
+                "chat_id": "",
+                "id": "",
+                "timestamp": 0,
+                "type": "USER_MESSAGE"
+              },
+              {
+                "role": "USER",
+                "message_text": null,
+                "emotion_features": null,
+                "chat_id": "",
+                "id": "",
+                "timestamp": 0,
+                "type": "USER_MESSAGE"
+              },
+              {
+                "role": "SYSTEM",
+                "message_text": "this is more than 200 characters long this is more than 200 characters long this is more than 200 characters long this is more than 200 characters long this is more than 200 characters long this is long",
+                "emotion_features": null,
+                "chat_id": "",
+                "id": "",
+                "timestamp": 0,
+                "type": "USER_MESSAGE"
+              },
+              {
+                "role": "SYSTEM",
+                "message_text": "this is less than 200 characters",
+                "emotion_features": null,
+                "chat_id": "",
+                "id": "",
+                "timestamp": 0,
+                "type": "USER_MESSAGE"
+              }
+            ],
+            "chat_group_id": "",
+            "id": "",
+            "page_number": 0,
+            "page_size": 0,
+            "pagination_direction": "ASC",
+            "start_timestamp": 0,
+            "status": "ACTIVE",
+            "total_pages": 0,
+            "config": {
+              "id": "config1d",
+              "version": 0
+            }
+          }
+        ''';
+
+        final result = ChatProvider.filterMessages(jsonString);
+
+        expect(result[0]["role"], "SYSTEM");
+        expect(result[1]["role"], "USER");
+        expect(result[2]["role"], "SYSTEM");
+        expect(result[3]["role"], "SYSTEM");
+        expect(result.length, 4);
+      });
+
+      test('handles empty events_page list', () {
+        final jsonString = '''
+          {
+            "chat_group_id": "",
+            "events_page": [
+            ],
+            "id": "",
+            "page_number": 0,
+            "page_size": 0,
+            "pagination_direction": "ASC",
+            "start_timestamp": 0,
+            "status": "ACTIVE",
+            "total_pages": 0,
+            "config": {
+              "id": "config1d",
+              "version": 0
+            }
+          }
+        ''';
+
+        final result = ChatProvider.filterMessages(jsonString);
+
+        expect(result, isEmpty);
+      });
+
+      test('no trimming when first message is USER', () {
+        final jsonString = '''
+          {
+            "chat_group_id": "",
+            "events_page": [
+              {
+                "role": "USER",
+                "message_text": "Hello!",
+                "emotion_features": "{}",
+                "chat_id": "",
+                "id": "",
+                "timestamp": 0,
+                "type": "USER_MESSAGE"
+              }
+            ],
+            "id": "",
+            "page_number": 0,
+            "page_size": 0,
+            "pagination_direction": "ASC",
+            "start_timestamp": 0,
+            "status": "ACTIVE",
+            "total_pages": 0,
+            "config": {
+              "id": "config1d",
+              "version": 0
+            }
+          }
+        ''';
+
+        final result = ChatProvider.filterMessages(jsonString);
+
+        expect(result.length, 1);
+        expect(result.first['role'], "USER");
+      });
+
+      test('stops trimming when non-USER message is short (<= 200 chars)', () {
+        final jsonString = '''
+        {
+          "events_page": [
+            {
+              "role": "SYSTEM",
+              "message_text": "${"a" * 250}",
+              "emotion_features": "{}",
+              "chat_id": "",
+              "id": "",
+              "timestamp": 0,
+              "type": "USER_MESSAGE"
+            },
+            {
+              "role": "SYSTEM",
+              "message_text": "Short message",
+              "emotion_features": "{}",
+              "chat_id": "",
+              "id": "",
+              "timestamp": 0,
+              "type": "USER_MESSAGE"
+            },
+            {
+              "role": "USER",
+              "message_text": "User hello",
+              "emotion_features": "{}",
+              "chat_id": "",
+              "id": "",
+              "timestamp": 0,
+              "type": "USER_MESSAGE"
+            }
+          ],
+          "chat_group_id": "",
+          "id": "",
+          "page_number": 0,
+          "page_size": 0,
+          "pagination_direction": "ASC",
+          "start_timestamp": 0,
+          "status": "ACTIVE",
+          "total_pages": 0,
+          "config": {
+            "id": "config1d",
+            "version": 0
+          }
+        }
+        ''';
+
+        final result = ChatProvider.filterMessages(jsonString);
+
+        // It should stop at the "Short message" because it's <= 200 chars, even though it's not USER.
+        expect(result, isNotEmpty);
+        expect(result[0]['text'], 'Short message');
+        expect(result[1]['text'], 'User hello');
+        expect(result.length, 2);
+      });
+
+      test('trims multiple long non-USER messages', () {
+        final jsonString = '''
+        {
+          "events_page": [
+            {
+              "role": "SYSTEM",
+              "message_text": "${"a" * 250}",
+              "emotion_features": "{}",
+              "chat_id": "",
+              "id": "",
+              "timestamp": 0,
+              "type": "USER_MESSAGE"
+            },
+            {
+              "role": "SYSTEM",
+              "message_text": "${"b" * 250}",
+              "emotion_features": "{}",
+              "chat_id": "",
+              "id": "",
+              "timestamp": 0,
+              "type": "USER_MESSAGE"
+            },
+            {
+              "role": "USER",
+              "message_text": "User text",
+              "emotion_features": "{}",
+              "chat_id": "",
+              "id": "",
+              "timestamp": 0,
+              "type": "USER_MESSAGE"
+            }
+          ],
+          "chat_group_id": "",
+          "id": "",
+          "page_number": 0,
+          "page_size": 0,
+          "pagination_direction": "ASC",
+          "start_timestamp": 0,
+          "status": "ACTIVE",
+          "total_pages": 0,
+          "config": {
+            "id": "config1d",
+            "version": 0
+          }
+        }
+        ''';
+
+        final result = ChatProvider.filterMessages(jsonString);
+
+        expect(result, isNotEmpty);
+        expect(result.first['role'], "USER");
+        expect(result.length, 1);
+      });
+
+      test('trims until specific condition is met in mixed sequence', () {
+        final jsonString = '''
+        {
+          "events_page": [
+            {
+              "role": "SYSTEM",
+              "message_text": "${"a" * 250}",
+              "emotion_features": "{}",
+              "chat_id": "",
+              "id": "",
+              "timestamp": 0,
+              "type": "USER_MESSAGE"
+            },
+            {
+              "role": "SYSTEM",
+              "message_text": "${"b" * 250}",
+              "emotion_features": "{}",
+              "chat_id": "",
+              "id": "",
+              "timestamp": 0,
+              "type": "USER_MESSAGE"
+            },
+            {
+              "role": "SYSTEM",
+              "message_text": "Short one",
+              "emotion_features": "{}",
+              "chat_id": "",
+              "id": "",
+              "timestamp": 0,
+              "type": "USER_MESSAGE"
+            },
+            {
+              "role": "USER",
+              "message_text": "User text",
+              "emotion_features": "{}",
+              "chat_id": "",
+              "id": "",
+              "timestamp": 0,
+              "type": "USER_MESSAGE"
+            }
+          ],
+          "chat_group_id": "",
+          "id": "",
+          "page_number": 0,
+          "page_size": 0,
+          "pagination_direction": "ASC",
+          "start_timestamp": 0,
+          "status": "ACTIVE",
+          "total_pages": 0,
+          "config": {
+            "id": "config1d",
+            "version": 0
+          }
+        }
+        ''';
+
+        final result = ChatProvider.filterMessages(jsonString);
+
+        expect(result, isNotEmpty);
+        expect(result.first['text'], 'Short one');
+        expect(result.length, 2);
+      });
+
+      test('stops trimming if role changes to USER', () {
+        final jsonString = '''
+        {
+          "events_page": [
+            {
+              "role": "SYSTEM",
+              "message_text": "${"a" * 250}",
+              "emotion_features": "{}",
+              "chat_id": "",
+              "id": "",
+              "timestamp": 0,
+              "type": "USER_MESSAGE"
+            },
+            {
+              "role": "USER",
+              "message_text": "${"b" * 250}",
+              "emotion_features": "{}",
+              "chat_id": "",
+              "id": "",
+              "timestamp": 0,
+              "type": "USER_MESSAGE"
+            }
+          ],
+          "chat_group_id": "",
+          "id": "",
+          "page_number": 0,
+          "page_size": 0,
+          "pagination_direction": "ASC",
+          "start_timestamp": 0,
+          "status": "ACTIVE",
+          "total_pages": 0,
+          "config": {
+            "id": "config1d",
+            "version": 0
+          }
+        }
+        ''';
+
+        final result = ChatProvider.filterMessages(jsonString);
+
+        // Even if the USER message is long, it should stop because role == 'USER'.
+        expect(result, isNotEmpty);
+        expect(result.first['role'], "USER");
+        expect(result.length, 1);
+      });
+    });
+
+    group('processEmotions', () {
+      test('calculates averages', () {
+        final messages = [
+          {'emotion_features': '{"Admiration": 0.4, "Adoration": 0.2}'},
+          {
+            'emotion_features':
+                '{"Admiration": 0.2, "Adoration": 0.6, "Awkwardness": 1.0}'
+          },
+          {'emotion_features': null}
+        ];
+
+        final result = ChatProvider.processEmotions(messages);
+
+        expect(result['Awkwardness'], 0.5);
+        expect(result['Adoration'], 0.4);
+        expect(result['Admiration'], (0.4 + 0.2) / 2);
+      });
+
+      test('sorts averages', () {
+        final messages = [
+          {'emotion_features': '{"Admiration": 0.4, "Adoration": 0.2}'},
+          {
+            'emotion_features':
+                '{"Admiration": 0.2, "Adoration": 0.6, "Awkwardness": 1.0}'
+          },
+          {'emotion_features': null}
+        ];
+
+        final result = ChatProvider.processEmotions(messages);
+
+        expect(result.keys.toString(), "(Awkwardness, Adoration, Admiration)");
+        expect(result.values.toString(), "(0.5, 0.4, ${(0.4 + 0.2) / 2})");
+      });
+
+      test('ignores empty emotion_features', () {
+        final messages = [
+          {'emotion_features': '{"Admiration": 0.8}'},
+          {'emotion_features': null}
+        ];
+
+        final result = ChatProvider.processEmotions(messages);
+
+        expect(result['Admiration'], 0.8);
+        expect(result.length, 1);
+      });
+
+      test('handles empty emotion_features object {}', () {
+        final messages = [
+          {'emotion_features': '{"Admiration": 0.8}'},
+          {'emotion_features': '{}'}
+        ];
+
+        final result = ChatProvider.processEmotions(messages);
+
+        final expected = <String, double>{};
+        expected['Admiration'] = 0.4;
+        expect(result, expected);
+      });
+
+      test(
+          'skips emotion_features that decodes to non-Map type (e.g. JSON array)',
+          () {
+        final messages = [
+          {'emotion_features': '[]'},
+          {'emotion_features': '{"Admiration": 0.8}'},
+          {'emotion_features': '"just_a_string"'}
+        ];
+
+        final result = ChatProvider.processEmotions(messages);
+
+        expect(result['Admiration'], 0.8);
+        expect(result.length, 1);
+      });
+    });
+  });
+}

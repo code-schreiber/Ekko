@@ -73,7 +73,7 @@ class ProsodyInference {
 
 class Inference {
   final ProsodyInference? prosody;
-  Inference(json) : prosody = ProsodyInference(json['prosody']);
+  Inference(json) : prosody = json['prosody'] != null ? ProsodyInference(json['prosody']) : null;
 }
 
 class AssistantMessage extends EviMessage {

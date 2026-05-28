@@ -57,8 +57,7 @@ jobs:
 
       - name: Build APK
         run: |
-          flutter build apk --release \
-            --dart-define=HUME_API_KEY=${{ secrets.HUME_API_KEY }}
+          flutter build apk --debug --target-platform android-arm64
 
       - name: Build iOS
         if: runner.os == 'macOS'
