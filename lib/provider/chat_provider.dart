@@ -1,8 +1,5 @@
 import 'dart:convert';
 
-import 'package:dio/dio.dart';
-import 'package:evi_example/data/api/generated/export.dart';
-import 'package:evi_example/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -69,37 +66,41 @@ class ChatProvider extends ChangeNotifier {
     _context = context;
   }
 
-  Future<ReturnChatPagedEvents> _fetchChatMessages(String chatId) async {
-    try {
-      var baseUrl = 'https://api.hume.ai/'; // TODO extract duplicate
-      final dio = Dio(BaseOptions(baseUrl: baseUrl));
-      final client = RestClient(dio);
-      final events = await client.subpackageChats.listChatEvents(
-        id:  chatId,
-        xHumeApiKey:   ConfigManager.instance.humeApiKey,
-        pageNumber: 0,
-        pageSize: 100,
-        ascendingOrder: false,
-      );
-      return events;
-    } catch (e) {
-      throw Exception('Failed to fetch messages: $e');
+  Future<String> _fetchChatMessages(String chatId) async {
+    final url = Uri.parse('https://api.hume.ai/v0/evi/chats/$chatId')
+        .replace(queryParameters: {
+      'page_number': '0',
+      'page_size': '100',
+      'ascending_order': 'false',
+    });
+
+    final response = await http.get(
+      url,
+      headers: {
+        'X-Hume-Api-Key': 'REPLACE_THIS_WITH_ACTUAL_HUME_API_KEY',
+      },
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to fetch messages: ${response.statusCode}');
     }
+    return response.body;
   }
 
-  static List<Map<String, dynamic>> filterMessages(ReturnChatPagedEvents events) {
-     final allMessages = events.eventsPage
+  static List<Map<String, dynamic>> filterMessages(String body) {
+    final data = json.decode(body);
+    final allMessages = data['events_page']
         .map((message) => {
-              'role': message.role,
-              'text': message.messageText,
-              'emotion_features': message.emotionFeatures,
-            })
+      'role': message['role'],
+      'text': message['message_text'],
+      'emotion_features': message['emotion_features'],
+    })
         .toList()
         .cast<Map<String, dynamic>>();
     print(allMessages);
     // Remove messages from the start until finding one less than 200 characters
     while (allMessages.isNotEmpty &&
-        allMessages.first['role'] != ReturnChatEventRole.user &&
+        allMessages.first['role'] != 'USER' &&
         allMessages.first['text'] != null &&
         allMessages.first['text'].length > 200) {
       allMessages.removeAt(0);

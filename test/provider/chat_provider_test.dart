@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:evi_example/data/api/generated/export.dart';
 import 'package:evi_example/provider/chat_provider.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -45,9 +44,8 @@ void main() {
             }
           }
         ''';
-        final events = ReturnChatPagedEvents.fromJson(jsonDecode(jsonString));
 
-        final result = ChatProvider.filterMessages(events);
+        final result = ChatProvider.filterMessages(jsonString);
 
         expect(result[0]['text'], "this is less than 200 characters");
         expect(result.length, 1);
@@ -108,14 +106,13 @@ void main() {
             }
           }
         ''';
-        final events = ReturnChatPagedEvents.fromJson(jsonDecode(jsonString));
 
-        final result = ChatProvider.filterMessages(events);
+        final result = ChatProvider.filterMessages(jsonString);
 
-        expect(result[0]["role"], ReturnChatEventRole.system);
-        expect(result[1]["role"], ReturnChatEventRole.user);
-        expect(result[2]["role"], ReturnChatEventRole.system);
-        expect(result[3]["role"], ReturnChatEventRole.system);
+        expect(result[0]["role"], "SYSTEM");
+        expect(result[1]["role"], "USER");
+        expect(result[2]["role"], "SYSTEM");
+        expect(result[3]["role"], "SYSTEM");
         expect(result.length, 4);
       });
 
@@ -138,9 +135,8 @@ void main() {
             }
           }
         ''';
-        final events = ReturnChatPagedEvents.fromJson(jsonDecode(jsonString));
 
-        final result = ChatProvider.filterMessages(events);
+        final result = ChatProvider.filterMessages(jsonString);
 
         expect(result, isEmpty);
       });
@@ -173,12 +169,11 @@ void main() {
             }
           }
         ''';
-        final events = ReturnChatPagedEvents.fromJson(jsonDecode(jsonString));
 
-        final result = ChatProvider.filterMessages(events);
+        final result = ChatProvider.filterMessages(jsonString);
 
         expect(result.length, 1);
-        expect(result.first['role'], ReturnChatEventRole.user);
+        expect(result.first['role'], "USER");
       });
 
       test('stops trimming when non-USER message is short (<= 200 chars)', () {
@@ -227,9 +222,8 @@ void main() {
           }
         }
         ''';
-        final events = ReturnChatPagedEvents.fromJson(jsonDecode(jsonString));
 
-        final result = ChatProvider.filterMessages(events);
+        final result = ChatProvider.filterMessages(jsonString);
 
         // It should stop at the "Short message" because it's <= 200 chars, even though it's not USER.
         expect(result, isNotEmpty);
@@ -284,12 +278,11 @@ void main() {
           }
         }
         ''';
-        final events = ReturnChatPagedEvents.fromJson(jsonDecode(jsonString));
 
-        final result = ChatProvider.filterMessages(events);
+        final result = ChatProvider.filterMessages(jsonString);
 
         expect(result, isNotEmpty);
-        expect(result.first['role'], ReturnChatEventRole.user);
+        expect(result.first['role'], "USER");
         expect(result.length, 1);
       });
 
@@ -348,9 +341,8 @@ void main() {
           }
         }
         ''';
-        final events = ReturnChatPagedEvents.fromJson(jsonDecode(jsonString));
 
-        final result = ChatProvider.filterMessages(events);
+        final result = ChatProvider.filterMessages(jsonString);
 
         expect(result, isNotEmpty);
         expect(result.first['text'], 'Short one');
@@ -394,13 +386,12 @@ void main() {
           }
         }
         ''';
-        final events = ReturnChatPagedEvents.fromJson(jsonDecode(jsonString));
 
-        final result = ChatProvider.filterMessages(events);
+        final result = ChatProvider.filterMessages(jsonString);
 
         // Even if the USER message is long, it should stop because role == 'USER'.
         expect(result, isNotEmpty);
-        expect(result.first['role'], ReturnChatEventRole.user);
+        expect(result.first['role'], "USER");
         expect(result.length, 1);
       });
     });
@@ -464,7 +455,9 @@ void main() {
         expect(result, expected);
       });
 
-      test('skips emotion_features that decodes to non-Map type (e.g. JSON array)', () {
+      test(
+          'skips emotion_features that decodes to non-Map type (e.g. JSON array)',
+          () {
         final messages = [
           {'emotion_features': '[]'},
           {'emotion_features': '{"Admiration": 0.8}'},
