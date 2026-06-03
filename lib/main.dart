@@ -2,6 +2,8 @@ import 'package:evi_example/pages/analytics_page.dart';
 import 'package:evi_example/pages/my_home_page.dart';
 import 'package:evi_example/pages/sessions_page.dart';
 import 'package:evi_example/provider/chat_provider.dart';
+import 'package:evi_example/repository/session_repository.dart';
+import 'package:evi_example/service/session_service.dart';
 import 'package:evi_example/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -17,6 +19,13 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => ChatProvider()),
+        ProxyProvider<ChatProvider, SessionRepository>(
+          update: (_, chatProvider, __) =>
+              ChatProviderSessionRepository(chatProvider),
+        ),
+        Provider<SessionService>(
+          create: (_) => const SessionService(),
+        ),
       ],
       child: const MyApp(child: NavigationPage()),
     ),

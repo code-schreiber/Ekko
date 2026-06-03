@@ -17,3 +17,11 @@ class Session with _$Session {
 
   factory Session.fromJson(Map<String, Object?> json) => _$SessionFromJson(json);
 }
+
+extension SessionX on Session {
+  List<String> topEmotionNames(int count) {
+    final sorted = emotions.entries.toList()
+      ..sort((a, b) => b.value.compareTo(a.value));
+    return sorted.take(count).map((e) => e.key).toList();
+  }
+}
