@@ -1,18 +1,32 @@
+import 'package:flutter/material.dart';
 import 'package:evi_example/models/session.dart';
 import 'package:evi_example/provider/chat_provider.dart';
 
-abstract class SessionRepository {
+abstract class SessionRepository extends ChangeNotifier {
   List<Session> getSessions();
 }
 
-class ChatProviderSessionRepository implements SessionRepository {
-  final ChatProvider _chatProvider;
+class ChatProviderSessionRepository extends ChangeNotifier
+    implements SessionRepository {
+  ChatProvider? _chatProvider;
 
-  ChatProviderSessionRepository(this._chatProvider);
+  void attach(ChatProvider chatProvider) {
+    _chatProvider?.removeListener(notifyListeners);
+    _chatProvider = chatProvider;
+    _chatProvider!.addListener(notifyListeners);
+    notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    _chatProvider?.removeListener(notifyListeners);
+    super.dispose();
+  }
 
   @override
   List<Session> getSessions() {
-    return _chatProvider.previousChats.map((chat) {
+    final chats = _chatProvider?.previousChats ?? [];
+    return chats.map((chat) {
       return Session(
         chatMessages: List<Map<String, dynamic>>.from(chat['chatMessages']),
         emotions: (chat['emotions'] as Map<String, dynamic>).map(

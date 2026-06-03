@@ -19,17 +19,42 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => ChatProvider()),
-        ProxyProvider<ChatProvider, SessionRepository>(
-          update: (_, chatProvider, __) =>
-              ChatProviderSessionRepository(chatProvider),
+        ChangeNotifierProvider<SessionRepository>(
+          create: (_) => ChatProviderSessionRepository(),
         ),
         Provider<SessionService>(
           create: (_) => const SessionService(),
         ),
       ],
-      child: const MyApp(child: NavigationPage()),
+      child: const _AttachRepositoryAndGo(),
     ),
   );
+}
+
+class _AttachRepositoryAndGo extends StatefulWidget {
+  const _AttachRepositoryAndGo();
+
+  @override
+  State<_AttachRepositoryAndGo> createState() => _AttachRepositoryAndGoState();
+}
+
+class _AttachRepositoryAndGoState extends State<_AttachRepositoryAndGo> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        final repo = context.read<ChatProviderSessionRepository>();
+        final chatProvider = context.read<ChatProvider>();
+        repo.attach(chatProvider);
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return const MyApp(child: NavigationPage());
+  }
 }
 
 class MyApp extends StatelessWidget {
@@ -62,7 +87,6 @@ class _NavigationPageState extends State<NavigationPage> {
     const MyHomePage(),
     const SessionsPage(),
     const AnalyticsPage(),
-    // const SettingsPage(),
   ];
 
   @override

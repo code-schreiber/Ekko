@@ -1,8 +1,7 @@
-import 'dart:convert';
-
-import 'package:collection/collection.dart';
+import 'package:evi_example/models/session.dart';
 import 'package:evi_example/pages/emotion_page.dart';
-import 'package:evi_example/provider/chat_provider.dart';
+import 'package:evi_example/repository/session_repository.dart';
+import 'package:evi_example/service/session_service.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -25,22 +24,10 @@ class SessionsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final chatProvider = Provider.of<ChatProvider>(context);
-    final sessions = chatProvider.previousChats;
-
-    // Group sessions by date
-    final sortedSessions = sessions.toList()
-      ..sort((a, b) => DateTime.parse(b['createdAt'])
-          .compareTo(DateTime.parse(a['createdAt'])));
-
-    // Assign IDs starting from 1 for the oldest session
-    for (int i = sortedSessions.length - 1; i >= 0; i--) {
-      sortedSessions[i]['sessionId'] = sortedSessions.length - i;
-    }
-
-    final groupedSessions = groupBy(sortedSessions, (session) {
-      return DateTime.parse(session['createdAt']).toString().split(' ')[0];
-    });
+    final repository = context.watch<SessionRepository>();
+    final sessionService = context.read<SessionService>();
+    final sessions = repository.getSessions();
+    final groupedSessions = sessionService.getGroupedSessions(sessions);
 
     return Scaffold(
       appBar: AppBar(
@@ -58,7 +45,6 @@ class SessionsPage extends StatelessWidget {
           itemBuilder: (context, index) {
             final date = groupedSessions.keys.elementAt(index);
             final dailySessions = groupedSessions[date]!;
-            final headerDate = DateTime.parse(date);
 
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -66,7 +52,7 @@ class SessionsPage extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Text(
-                    DateFormat('E, MMM d').format(headerDate),
+                    DateFormat('E, MMM d').format(date),
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 20,
@@ -75,29 +61,22 @@ class SessionsPage extends StatelessWidget {
                   ),
                 ),
                 ...dailySessions.map((session) {
-                  final sessionTime = DateTime.parse(session['createdAt']);
-                  final emotions =
-                      (session['emotions'] as Map<String, dynamic>).map(
-                    (key, value) => MapEntry(key, (value as num).toDouble()),
-                  );
-                  final topEmotions = emotions.entries.toList()
-                    ..sort((a, b) => b.value.compareTo(a.value));
+                  final sessionId = sessions.indexOf(session) + 1;
+                  final sessionTime = DateTime.parse(session.createdAt);
                   final top3Emotions =
-                      topEmotions.take(3).map((e) => e.key).join(', ');
+                      session.topEmotionNames(3).join(', ');
 
                   return GestureDetector(
                     onTap: () {
-                      print(
-                          const JsonEncoder.withIndent('  ').convert(sessions));
                       Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) => EmotionPage(
-                            chatMessages: session['chatMessages'],
-                            emotions: emotions,
-                            diga: session['diga'],
-                            whatWentWell: session['whatWentWell'],
-                            challenges: session['challenges'],
+                            chatMessages: session.chatMessages,
+                            emotions: session.emotions,
+                            diga: session.diga,
+                            whatWentWell: session.whatWentWell,
+                            challenges: session.challenges,
                           ),
                         ),
                       );
@@ -110,7 +89,7 @@ class SessionsPage extends StatelessWidget {
                       ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(4),
-                        side: BorderSide(
+                        side: const BorderSide(
                           color: Colors.transparent,
                         ),
                       ),
@@ -119,19 +98,21 @@ class SessionsPage extends StatelessWidget {
                           borderRadius: BorderRadius.circular(4),
                           border: Border(
                             bottom: BorderSide(
-                              color: _getPriorityColor(session['priority']),
+                              color:
+                                  _getPriorityColor(session.priority),
                               width: 1.0,
                             ),
                           ),
                         ),
                         child: ListTile(
                           title: Text(
-                            'Session ${session['sessionId']} at ${DateFormat('HH:mm').format(sessionTime)}',
+                            'Session $sessionId at ${DateFormat('HH:mm').format(sessionTime)}',
                             style: const TextStyle(color: Colors.white),
                           ),
                           subtitle: Text(
                             top3Emotions,
-                            style: const TextStyle(color: Colors.white70),
+                            style:
+                                const TextStyle(color: Colors.white70),
                           ),
                         ),
                       ),
