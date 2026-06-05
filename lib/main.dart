@@ -44,7 +44,7 @@ class _AttachRepositoryAndGoState extends State<_AttachRepositoryAndGo> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
-        final repo = context.read<ChatProviderSessionRepository>();
+        final repo = context.read<SessionRepository>() as ChatProviderSessionRepository;
         final chatProvider = context.read<ChatProvider>();
         repo.attach(chatProvider);
       }

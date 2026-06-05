@@ -14,11 +14,33 @@ class _TestSessionRepository extends ChangeNotifier
   _TestSessionRepository(this._sessions);
 
   @override
-  List<Session> getSessions() => _sessions;
+  List<Session> getSessions() => List.unmodifiable(_sessions);
+
+  void addSession(Session session) {
+    _sessions.add(session);
+    notifyListeners();
+  }
+
+  void removeLast() {
+    _sessions.removeLast();
+    notifyListeners();
+  }
 }
 
 Widget _buildTestApp({required List<Session> sessions}) {
   final repository = _TestSessionRepository(sessions);
+  return MaterialApp(
+    home: MultiProvider(
+      providers: [
+        ChangeNotifierProvider<SessionRepository>.value(value: repository),
+        Provider<SessionService>.value(value: const SessionService()),
+      ],
+      child: const SessionsPage(),
+    ),
+  );
+}
+
+Widget _buildTestAppWithRepo({required _TestSessionRepository repository}) {
   return MaterialApp(
     home: MultiProvider(
       providers: [
@@ -107,6 +129,148 @@ void main() {
 
       expect(find.textContaining('Session 1'), findsOneWidget);
       expect(find.textContaining('10:00'), findsOneWidget);
+    });
+
+    testWidgets('empty emotions renders with blank subtitle', (tester) async {
+      final sessions = [
+        Session(
+          chatMessages: [],
+          emotions: {},
+          createdAt: '2024-12-01T10:00:00.000000',
+          priority: 'low',
+          diga: '',
+          whatWentWell: '',
+          challenges: '',
+        ),
+      ];
+
+      await tester.pumpWidget(_buildTestApp(sessions: sessions));
+      await tester.pump();
+
+      final subtitle = tester.widget<ListTile>(find.byType(ListTile)).subtitle;
+      expect((subtitle as Text).data, isEmpty);
+    });
+
+    testWidgets('sessions on same date sorted by time descending',
+        (tester) async {
+      final sessions = [
+        Session(
+          chatMessages: [],
+          emotions: {'Joy': 0.5},
+          createdAt: '2024-12-01T10:00:00.000000',
+          priority: 'low',
+          diga: '',
+          whatWentWell: '',
+          challenges: '',
+        ),
+        Session(
+          chatMessages: [],
+          emotions: {'Sadness': 0.8},
+          createdAt: '2024-12-01T14:00:00.000000',
+          priority: 'medium',
+          diga: '',
+          whatWentWell: '',
+          challenges: '',
+        ),
+        Session(
+          chatMessages: [],
+          emotions: {'Anger': 0.9},
+          createdAt: '2024-12-01T18:00:00.000000',
+          priority: 'high',
+          diga: '',
+          whatWentWell: '',
+          challenges: '',
+        ),
+      ];
+
+      await tester.pumpWidget(_buildTestApp(sessions: sessions));
+      await tester.pump();
+
+      final sessionTitles =
+          find.textContaining('Session').evaluate().map((e) {
+            return (e.widget as Text).data;
+          }).toList();
+
+      expect(sessionTitles[0], contains('18:00'));
+      expect(sessionTitles[1], contains('14:00'));
+      expect(sessionTitles[2], contains('10:00'));
+    });
+
+    testWidgets('renders sessions across multiple dates', (tester) async {
+      final sessions = [
+        Session(
+          chatMessages: [],
+          emotions: {'Joy': 0.5},
+          createdAt: '2024-11-28T10:00:00.000000',
+          priority: 'low',
+          diga: '',
+          whatWentWell: '',
+          challenges: '',
+        ),
+        Session(
+          chatMessages: [],
+          emotions: {'Sadness': 0.8},
+          createdAt: '2024-11-29T10:00:00.000000',
+          priority: 'low',
+          diga: '',
+          whatWentWell: '',
+          challenges: '',
+        ),
+        Session(
+          chatMessages: [],
+          emotions: {'Anger': 0.9},
+          createdAt: '2024-12-01T10:00:00.000000',
+          priority: 'low',
+          diga: '',
+          whatWentWell: '',
+          challenges: '',
+        ),
+      ];
+
+      await tester.pumpWidget(_buildTestApp(sessions: sessions));
+      await tester.pump();
+
+      expect(find.text('Thu, Nov 28'), findsOneWidget);
+      expect(find.text('Fri, Nov 29'), findsOneWidget);
+      expect(find.text('Sun, Dec 1'), findsOneWidget);
+    });
+
+    testWidgets('rebuilds when repository notifies listeners',
+        (tester) async {
+      final repository = _TestSessionRepository([
+        Session(
+          chatMessages: [],
+          emotions: {'Joy': 0.5},
+          createdAt: '2024-12-01T10:00:00.000000',
+          priority: 'low',
+          diga: '',
+          whatWentWell: '',
+          challenges: '',
+        ),
+      ]);
+
+      await tester.pumpWidget(_buildTestAppWithRepo(repository: repository));
+      await tester.pump();
+
+      expect(find.textContaining('Session 1'), findsOneWidget);
+
+      repository.addSession(Session(
+        chatMessages: [],
+        emotions: {'Sadness': 0.8},
+        createdAt: '2024-12-02T10:00:00.000000',
+        priority: 'high',
+        diga: '',
+        whatWentWell: '',
+        challenges: '',
+      ));
+      await tester.pump();
+
+      expect(find.textContaining('Session 2'), findsOneWidget);
+
+      repository.removeLast();
+      await tester.pump();
+
+      expect(find.textContaining('Session 2'), findsNothing);
     });
   });
 }
