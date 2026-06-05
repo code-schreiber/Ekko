@@ -26,19 +26,19 @@ void main() async {
           create: (_) => const SessionService(),
         ),
       ],
-      child: const _AttachRepositoryAndGo(),
+      child: const AppRoot(),
     ),
   );
 }
 
-class _AttachRepositoryAndGo extends StatefulWidget {
-  const _AttachRepositoryAndGo();
+class AppRoot extends StatefulWidget {
+  const AppRoot({super.key});
 
   @override
-  State<_AttachRepositoryAndGo> createState() => _AttachRepositoryAndGoState();
+  State<AppRoot> createState() => _AppRootState();
 }
 
-class _AttachRepositoryAndGoState extends State<_AttachRepositoryAndGo> {
+class _AppRootState extends State<AppRoot> {
   @override
   void initState() {
     super.initState();

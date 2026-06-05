@@ -7,8 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
-  testWidgets(
-      'SessionRepository can be downcast to ChatProviderSessionRepository',
+  testWidgets('SessionRepository can be downcast to ChatProviderSessionRepository',
       (tester) async {
     SharedPreferences.setMockInitialValues({});
 
@@ -23,22 +22,24 @@ void main() {
             create: (_) => const SessionService(),
           ),
         ],
-        child: _AttachWidget(),
+        child: const _AppRootMinimal(),
       ),
     );
 
     await tester.pump();
 
-    expect(find.byType(_AttachWidget), findsOneWidget);
+    expect(find.byType(_AppRootMinimal), findsOneWidget);
   });
 }
 
-class _AttachWidget extends StatefulWidget {
+class _AppRootMinimal extends StatefulWidget {
+  const _AppRootMinimal();
+
   @override
-  State<_AttachWidget> createState() => _AttachWidgetState();
+  State<_AppRootMinimal> createState() => _AppRootMinimalState();
 }
 
-class _AttachWidgetState extends State<_AttachWidget> {
+class _AppRootMinimalState extends State<_AppRootMinimal> {
   @override
   void initState() {
     super.initState();
