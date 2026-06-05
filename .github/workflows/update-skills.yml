@@ -1,8 +1,8 @@
-name: Weekly Skill Update
+name: Skill Update
 
 on:
   schedule:
-    - cron: '0 6 * * 1'
+    - cron: '0 5 * * 1-5'
   workflow_dispatch:
 
 permissions:
@@ -15,7 +15,20 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - name: Check for skill changes
+      - name: Install official Flutter skills
+        run: npx skills add flutter/skills --skill '*' --agent universal
+
+      - name: Commit official skills
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .agents/ skills-lock.json
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: update official Flutter agent skills"
+            git push
+          fi
+
+      - name: Check for project skill changes
         id: check
         run: |
           if git diff --quiet HEAD -- .opencode/skills/; then
@@ -25,13 +38,14 @@ jobs:
           fi
 
       - name: Create Pull Request
+        if: steps.check.outputs.changed == 'true'
         uses: peter-evans/create-pull-request@v7
         with:
           commit-message: "chore: update opencode flutter skill"
           branch: "chore/update-skills"
           title: "chore: update opencode flutter skill"
           body: |
-            Weekly automated PR to review and update the opencode Flutter skill.
+            Automated PR to review and update the opencode Flutter skill.
 
             ## Checklist
             - [ ] Review `.opencode/skills/flutter/SKILL.md` for accuracy
