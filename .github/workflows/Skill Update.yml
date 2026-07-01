@@ -18,38 +18,27 @@ jobs:
       - name: Install official Flutter skills
         run: npx skills add flutter/skills --skill '*' --agent universal
 
-      - name: Commit official skills
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add .agents/ skills-lock.json
-          if ! git diff --cached --quiet; then
-            git commit -m "chore: update official Flutter agent skills"
-            git push
-          fi
-
-      - name: Check for project skill changes
+      - name: Check for changes
         id: check
         run: |
-          if git diff --quiet HEAD -- .opencode/skills/; then
-            echo "changed=false" >> "$GITHUB_OUTPUT"
-          else
+          if ! git diff --quiet HEAD -- .agents/ skills-lock.json .opencode/skills/; then
             echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Create Pull Request
         if: steps.check.outputs.changed == 'true'
         uses: peter-evans/create-pull-request@v7
         with:
-          commit-message: "chore: update opencode flutter skill"
+          commit-message: "chore: update opencode skills"
           branch: "chore/update-skills"
-          title: "chore: update opencode flutter skill"
+          title: "chore: update opencode skills"
           body: |
-            Automated PR to review and update the opencode Flutter skill.
+            Automated PR to review and update opencode skills.
 
             ## Checklist
-            - [ ] Review `.opencode/skills/flutter/SKILL.md` for accuracy
-            - [ ] Update architecture descriptions if patterns changed
-            - [ ] Add new key files or directories
-            - [ ] Update test commands if needed
+            - [ ] Review `.agents/` and `skills-lock.json` for official skill changes
+            - [ ] Review `.opencode/skills/` for project skill changes
+            - [ ] Verify test commands
             - [ ] Document any new conventions
